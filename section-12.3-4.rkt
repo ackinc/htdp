@@ -2,10 +2,8 @@
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname section-12.3-4) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
 (require 2htdp/batch-io)
-;(define DICT-LOCATION "usr/share/dict")
-;(define DICT (read-lines DICT-LOCATION))
-
-(define DICT '("a" "cat" "act" "rat" "art" "tar"))
+(define DICT-LOCATION "/usr/share/dict/words")
+(define DICT (read-lines DICT-LOCATION))
 
 
 ; List-of-Strings -> Boolean
