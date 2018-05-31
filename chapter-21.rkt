@@ -129,7 +129,8 @@
 ; parses sl into a list of data definitions
 (check-expect (parse-da empty) empty)
 (check-expect (parse-da '((define x 5))) '((x 5)))
-(check-expect (parse-da '((define x 5) (define y 2)))
+(check-expect (parse-da '((define x 5)
+                          (define y 2)))
               '((x 5) (y 2)))
 (check-expect (parse-da '((define x 5)
                           (define (f r) (+ r r))))
