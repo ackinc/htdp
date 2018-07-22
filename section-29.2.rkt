@@ -128,13 +128,13 @@
 (define (place-queens a-board n)
   (cond [(zero? n) empty]
         [else (local ((define open-spots
-                        (find-open-spots a-board)))
+                        (find-open-spots-1 a-board)))
                 (if (empty? open-spots)
                     #false
                     (ormap-alt
                      (lambda (spot)
                        (local ((define result
-                                 (place-queens (add-queen a-board spot)
+                                 (place-queens (add-queen-1 a-board spot)
                                                (sub1 n))))
                          (if (false? result)
                              #false
@@ -145,105 +145,105 @@
 ; ex 483
 
 ; Part 1
-; A Board contains those positions where a queen can
+; A Board-1 contains those positions where a queen can
 ;   still be (no guarantees of safety) placed
-;(define-struct board [size positions])
-; A Board is a structure: (make-board N [List-of Posn])
+(define-struct board-1 [size positions])
+; A Board-1 is a structure: (make-board-1 N [List-of Posn])
 
-; N -> Board
-; creates an empty nxn board
-;(define (board0 n)
-;  (make-board n
-;              (for*/list ([i n] [j n])
-;                (make-posn i j))))
+; N -> Board-1
+; creates an empty nxn Board-1
+(define (board0-1 n)
+  (make-board-1 n
+                (for*/list ([i n] [j n])
+                  (make-posn i j))))
 
-; Board QP -> Board
+; Board-1 QP -> Board-1
 ; places a queen on a-board at position qp
-;(define (add-queen a-board qp)
-;  (make-board (board-size a-board)
-;              (remove qp (board-positions a-board))))
+(define (add-queen-1 a-board qp)
+  (make-board-1 (board-1-size a-board)
+                (remove qp (board-1-positions a-board))))
 
-; Board -> [List-of QP]
-; given a board, with/out some queens
+; Board-1 -> [List-of QP]
+; given a Board-1, with/out some queens
 ;   returns the positions of the queens
-;(define (extract-qps a-board)
-;  (local ((define all-spots
-;            (board-positions (board0 (board-size a-board)))))
-;    (filter (lambda (spot)
-;              (not (member? spot (board-positions a-board))))
-;            all-spots)))
+(define (extract-qps a-board)
+  (local ((define all-spots
+            (board-1-positions (board0-1 (board-1-size a-board)))))
+    (filter (lambda (spot)
+              (not (member? spot (board-1-positions a-board))))
+            all-spots)))
 
-; Board -> [List-of Posn]
+; Board-1 -> [List-of Posn]
 ; returns all unthreatened positions on a-board
-;(define (find-open-spots a-board)
-;  (local ((define qps (extract-qps a-board)))
-;    (filter (lambda (spot)
-;              (not (threatened? spot qps)))
-;            (board-positions a-board))))
+(define (find-open-spots-1 a-board)
+  (local ((define qps (extract-qps a-board)))
+    (filter (lambda (spot)
+              (not (threatened? spot qps)))
+            (board-1-positions a-board))))
 
 ; Part 2
-; A Board contains those positions where a queen has been
+; A Board-2 contains those positions where a queen has been
 ;   placed
-;(define-struct board [size qps])
-; A Board is a structure (make-board N [List-of QP])
+(define-struct board-2 [size qps])
+; A Board-2 is a structure (make-board N [List-of QP])
 
-; N -> Board
-; creates an empty nxn board
-;(define (board0 n) (make-board n empty))
+; N -> Board-2
+; creates an empty nxn Board-2
+(define (board0-2 n) (make-board-2 n empty))
 
-; Board QP -> Board
+; Board-2 QP -> Board-2
 ; places a queen on a-board at position qp
-;(define (add-queen a-board spot)
-;  (make-board (board-size a-board)
-;              (cons spot (board-qps a-board))))
+(define (add-queen-2 a-board spot)
+  (make-board-2 (board-2-size a-board)
+                (cons spot (board-2-qps a-board))))
 
-; Board -> [List-of Posn]
+; Board-2 -> [List-of Posn]
 ; returns all unthreatened positions on a-board
-;(define (find-open-spots a-board)
-;  (local ((define n (board-size a-board)))
-;    (filter (lambda (posn)
-;              (not (threatened? posn (board-qps a-board))))
-;            (for*/list ([i n] [j n])
-;              (make-posn i j)))))
+(define (find-open-spots-2 a-board)
+  (local ((define n (board-2-size a-board)))
+    (filter (lambda (posn)
+              (not (threatened? posn (board-2-qps a-board))))
+            (for*/list ([i n] [j n])
+              (make-posn i j)))))
 
 
 ; Part 3
-; A Board is a grid of nxn Boxes, each possibly occupied
+; A Board-3 is a grid of nxn Boxes, each possibly occupied
 ;   by a queen
-(define-struct board [size boxes])
-; A Board is a structure: (make-board N [List-of Box])
+(define-struct board-3 [size boxes])
+; A Board-3 is a structure: (make-board-3 N [List-of Box])
 
 (define-struct box [x y threatened?])
 ; A Box is a structure: (make-box N N Boolean)
 
-; N -> Board
-; creates an empty nxn board
-(define (board0 n)
-  (make-board n
-              (for*/list ([i n] [j n])
-                (make-box i j #false))))
+; N -> Board-3
+; creates an empty nxn Board-3
+(define (board0-3 n)
+  (make-board-3 n
+                (for*/list ([i n] [j n])
+                  (make-box i j #false))))
 
 ; Box -> Posn
 (define (box->posn sq) (make-posn (box-x sq) (box-y sq)))
 
-; Board QP -> Board
+; Board-3 QP -> Board-3
 ; places a queen on a-board at position qp
-(define (add-queen a-board qp)
-  (make-board (board-size a-board)
-              (map (lambda (p)
-                     (make-box (box-x p)
-                               (box-y p)
-                               (or (box-threatened? p)
-                                   (threatening? (box->posn p)
-                                                 qp))))
-                   (board-boxes a-board))))
+(define (add-queen-3 a-board qp)
+  (make-board-3 (board-3-size a-board)
+                (map (lambda (p)
+                       (make-box (box-x p)
+                                 (box-y p)
+                                 (or (box-threatened? p)
+                                     (threatening? (box->posn p)
+                                                   qp))))
+                     (board-3-boxes a-board))))
 
-; Board -> [List-of Posn]
+; Board-3 -> [List-of Posn]
 ; returns all unthreatened positions on a-board
-(define (find-open-spots a-board)
+(define (find-open-spots-3 a-board)
   (map box->posn (filter (lambda (spot)
                            (not (box-threatened? spot)))
-                         (board-boxes a-board))))
+                         (board-3-boxes a-board))))
 
 
 
@@ -252,9 +252,67 @@
 ; finds a solution to the n-queens problem
 (check-expect (n-queens 2) #false)
 (check-expect (n-queens 3) #false)
-(check-satisfied (n-queens 4)
-                 (lambda (soln) (n-queens-solution? 4 soln)))
-(define (n-queens n) (place-queens (board0 n) n))
+(check-satisfied (n-queens 4) (lambda (soln) (n-queens-solution? 4 soln)))
+(check-satisfied (n-queens 8) (lambda (soln) (n-queens-solution? 8 soln)))
+(define (n-queens n) (place-queens (board0-1 n) n))
+
+
+; Challenge (after ex 483)
+; An abstracted version of place-queens
+; Board N [Board -> [List-of Posn]] [Board QP -> Board] -> [Maybe [List-of QP]]
+; places n queens on board (that may already
+;   contain some queens)
+(define (place-queens-abstracted a-board n
+                                 add-queen find-open-spots)
+  (cond [(zero? n) empty]
+        [else (local ((define open-spots
+                        (find-open-spots a-board)))
+                (if (empty? open-spots)
+                    #false
+                    (ormap-alt
+                     (lambda (spot)
+                       (local ((define result
+                                 (place-queens-abstracted (add-queen a-board spot)
+                                                          (sub1 n)
+                                                          add-queen
+                                                          find-open-spots)))
+                         (if (false? result)
+                             #false
+                             (cons spot result))))
+                     open-spots)))]))
+
+; The following versions of n-queens are for testing
+;   place-queens-abstracted
+
+; N -> [Maybe [List-of QP]]
+; finds a solution to the n-queens problem
+(check-expect (n-queens-1 2) #false)
+(check-expect (n-queens-1 3) #false)
+(check-satisfied (n-queens-1 4) (lambda (soln) (n-queens-solution? 4 soln)))
+(check-satisfied (n-queens-1 8) (lambda (soln) (n-queens-solution? 8 soln)))
+(define (n-queens-1 n)
+  (place-queens-abstracted (board0-1 n) n
+                           add-queen-1 find-open-spots-1))
+
+; N -> [Maybe [List-of QP]]
+; finds a solution to the n-queens problem
+(check-expect (n-queens-2 2) #false)
+(check-expect (n-queens-2 3) #false)
+(check-satisfied (n-queens-2 4) (lambda (soln) (n-queens-solution? 4 soln)))
+(check-satisfied (n-queens-2 8) (lambda (soln) (n-queens-solution? 8 soln)))
+(define (n-queens-2 n)
+  (place-queens-abstracted (board0-2 n) n
+                           add-queen-2 find-open-spots-2))
+
+; N -> [Maybe [List-of QP]]
+; finds a solution to the n-queens problem
+(check-expect (n-queens-3 2) #false)
+(check-expect (n-queens-3 3) #false)
+(check-satisfied (n-queens-3 4) (lambda (soln) (n-queens-solution? 4 soln)))
+(check-satisfied (n-queens-3 8) (lambda (soln) (n-queens-solution? 8 soln)))
+(define (n-queens-3 n)
+  (place-queens-abstracted (board0-3 n) n
+                           add-queen-3 find-open-spots-3))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
